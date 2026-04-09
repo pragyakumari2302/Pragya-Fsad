@@ -1,0 +1,249 @@
+================================================================================
+                        CAMPUSCORE ERP - PROJECT DOCUMENTATION
+                           Workflow & User Journey Guide
+================================================================================
+
+PROJECT NAME: CampusCore ERP (FSAD Project)
+STACK:        React 19 + Vite (Frontend)  |  Spring Boot 3 + MySQL (Backend)
+SCHEMA:       MySQL database "adnan"
+VERSION:      3.0 (Full-Stack Admin God-Mode Edition)
+
+================================================================================
+                            HOW TO RUN
+================================================================================
+
+1) START THE BACKEND (Spring Boot on port 8080):
+   - Open terminal in the "backend" folder
+   - Run:  mvn spring-boot:run
+     (if mvn not on PATH, use full path to maven, e.g.:
+      $env:PATH = "C:\Users\adnan\.maven\maven-3.9.13\bin;$env:PATH"; mvn spring-boot:run)
+   - Wait until you see "Started ErpBackendApplication" in the console
+   - Backend will be live at: http://localhost:8080
+
+2) START THE FRONTEND (Vite dev server on port 5173):
+   - Open a separate terminal in the "FSAD_PROJECT" folder
+   - Run:  npm run dev
+     (if execution policy blocks it:
+      powershell -ExecutionPolicy Bypass -Command "npm run dev")
+   - Frontend will be live at: http://localhost:5173
+
+3) OPEN IN BROWSER:
+   - Navigate to http://localhost:5173
+   - You will see the Login page
+
+================================================================================
+                       MASTER PASSWORD & CREDENTIALS
+================================================================================
+
+  *** MASTER PASSWORD: 1234 ***
+
+  This password works for EVERY user account in the system (seeded or
+  newly registered).  You can log in to any account with "1234".
+
+SEEDED DEMO ACCOUNTS:
+--------------------------------------------------------------
+| Role     | Email                     | Password | Username  |
+|----------|---------------------------|----------|-----------|
+| Admin    | admin@campuscore.edu      | 1234     | admin     |
+| Student  | student@campuscore.edu    | 1234     | student   |
+| Teacher  | teacher@campuscore.edu    | 1234     | teacher   |
+--------------------------------------------------------------
+
+You can also register new accounts via the /signup page.
+Any newly registered account can also be logged in with "1234".
+
+================================================================================
+                      USER ROLES & COMPLETE JOURNEYS
+================================================================================
+
+There are THREE user roles in CampusCore ERP: Admin, Student, and Teacher.
+
+------------------------------------------------------------------------------
+ROLE 1: ADMIN (GOD-MODE)
+------------------------------------------------------------------------------
+
+LOGIN:
+  - Email: admin@campuscore.edu  |  Password: 1234
+
+ADMIN DASHBOARD (/admin):
+  The Admin gets a completely separate frontend dashboard similar to PathWise.
+  This dashboard provides GOD-LEVEL power over the entire database through
+  directly mapped CRUD interfaces.
+
+  ┌─────────────────────────────────────────────────────────┐
+  │  1. Dashboard          → Total statistics and fast-actions│
+  │  2. Students           → Add, edit, or delete student rows│
+  │  3. Teachers           → Add, edit, or delete teachers  │
+  │  4. Courses            → Create, edit, or delete courses│
+  │  5. Enrollments        → View all student enrollments   │
+  │  6. Attendance         → View all global attendance     │
+  │  7. Marks              → View all graded assessments    │
+  │  8. Fees               → Manage fee structures/payments │
+  │  9. Library            → Manage books and issue records │
+  │ 10. Database Live View → Directly view MySQL table state│
+  │ 11. Profile            → Admin credentials & info       │
+  └─────────────────────────────────────────────────────────┘
+
+------------------------------------------------------------------------------
+ROLE 2: STUDENT
+------------------------------------------------------------------------------
+
+LOGIN:
+  - Email: student@campuscore.edu  |  Password: 1234
+
+STUDENT SIDEBAR MENU:
+  ┌─────────────────────────────────────────────────────────┐
+  │  1. Dashboard          → Student home overview          │
+  │  2. Registration       → Connects to Database for live  │
+  │                          course enrollment / drop       │
+  │  3. Attendance         → View attendance records        │
+  │  4. My Courses         → Browse enrolled courses        │
+  │  5. Exams              → Upcoming exams & results       │
+  │  6. Fees               → Fee payment status & history   │
+  │  7. Library            → Library catalog & borrowing    │
+  │  8. Grades & CGPA      → Semester grades, GPA/CGPA      │
+  │  9. Timetable          → Weekly class schedule          │
+  │ 10. Profile            → Personal info & settings       │
+  └─────────────────────────────────────────────────────────┘
+
+------------------------------------------------------------------------------
+ROLE 3: TEACHER (EDUCATOR)
+------------------------------------------------------------------------------
+
+LOGIN:
+  - Email: teacher@campuscore.edu  |  Password: 1234
+
+TEACHER SIDEBAR MENU:
+  ┌─────────────────────────────────────────────────────────┐
+  │  1. Educator Dashboard → Teacher home overview          │
+  │  2. Manage Courses     → Course management & catalog    │
+  │  3. Mark Attendance    → Record student attendance      │
+  │  4. Manage Exams       → Create/view exams & results    │
+  │  5. Student Directory  → View all registered students   │
+  │  6. Analytical Reports → Generate & download reports    │
+  │  7. My Schedule        → Personal teaching timetable    │
+  │  8. Profile            → Personal info & settings       │
+  │  9. Settings           → Application preferences        │
+  └─────────────────────────────────────────────────────────┘
+
+================================================================================
+                          API ENDPOINTS (Backend)
+================================================================================
+
+Authentication:
+  POST /api/auth/login    → Login with email + password, returns JWT
+  POST /api/auth/signup   → Register a new account
+
+Admin Tooling:
+  GET  /api/database      → Returns all tables for Live View
+  GET  /api/database/stats→ Returns table population count
+
+Users (Admin):
+  GET/POST/PUT/DELETE /api/users
+
+Courses:
+  GET/POST/PUT/DELETE /api/courses
+
+Enrollments:
+  GET/POST/PUT/DELETE /api/enrollments
+  GET /api/enrollments/student/{id}
+
+Attendance:
+  GET/POST/PUT/DELETE /api/attendance
+  GET /api/attendance/student/{id}
+
+Marks & Grades:
+  GET/POST/PUT/DELETE /api/marks
+  GET /api/marks/student/{id}
+
+Fees:
+  GET/POST/PUT/DELETE /api/fees/items
+  GET/POST /api/fees/payments
+
+Library:
+  GET/POST/PUT/DELETE /api/library/books
+  GET/POST /api/library/issues
+
+Exams / Reports / Dashboard:
+  GET /api/exams
+  GET /api/reports
+  GET /api/dashboard
+
+================================================================================
+                        DATABASE (MySQL Schema: "adnan")
+================================================================================
+
+Tables auto-created by Hibernate on startup:
+  - users
+  - course
+  - enrollment              (NEW)
+  - attendance_record       (NEW)
+  - mark                    (NEW)
+  - fee_item                (NEW)
+  - fee_payment             (NEW)
+  - library_book            (NEW)
+  - library_issue           (NEW)
+  - exam_upcoming
+  - exam_result
+  - report
+  - dashboard_stats
+  - dashboard_activity
+
+All tables are auto-seeded with robust demo data on first startup via:
+  - DataInitializer.java  → Seeds Admin, Student, Teacher accounts
+  - DatabaseSeeder.java   → Seeds dozens of rows for fees, library books, courses, enrollments, etc.
+
+================================================================================
+                          PROJECT STRUCTURE
+================================================================================
+
+Adnan/
+├── FSAD_PROJECT/              ← React Frontend
+│   ├── src/
+│   │   ├── api/mockApi.js     ← Master API client mapping to all backend paths
+│   │   ├── app/App.jsx        ← Root component with routing
+│   │   ├── app/routes.jsx     ← All page routes
+│   │   ├── components/        ← UI components (Layout, Sidebar, Navbar)
+│   │   ├── context/           ← AuthContext for JWT session
+│   │   ├── pages/             ← All page components
+│   │   │   ├── AdminDashboard.jsx ← (NEW) Independent Admin God-Mode Interface
+│   │   │   ├── Login.jsx
+│   │   │   ├── Signup.jsx
+│   │   │   ├── AcademicRegistration.jsx (Interactive)
+│   │   │   └── (... other student/teacher pages)
+│   └── package.json
+│
+├── backend/                   ← Spring Boot Backend
+│   ├── src/main/java/com/adnan/erp/
+│   │   ├── ErpBackendApplication.java
+│   │   ├── config/
+│   │   │   ├── SecurityConfig.java
+│   │   │   ├── CorsConfig.java
+│   │   │   ├── DataInitializer.java
+│   │   │   └── DatabaseSeeder.java
+│   │   ├── controller/
+│   │   │   ├── AuthController.java
+│   │   │   ├── DatabaseViewController.java  (NEW)
+│   │   │   ├── EnrollmentController.java    (NEW)
+│   │   │   ├── AttendanceController.java    (NEW)
+│   │   │   ├── MarkController.java          (NEW)
+│   │   │   ├── FeeController.java           (NEW)
+│   │   │   ├── LibraryController.java       (NEW)
+│   │   │   └── (... other controllers)
+│   │   ├── model/                      ← 14 JPA Entities
+│   │   ├── repository/                 ← 14 Spring Data Repositories
+│   │   └── security/
+│   │       ├── JwtUtil.java
+│   │       └── JwtAuthenticationFilter.java
+│   └── src/main/resources/
+│       └── application.properties      ← MySQL connection logic
+│
+├── Another Project/           ← PathWise (reference inspiration)
+└── start.txt                  ← THIS FILE
+
+================================================================================
+                               END OF DOCUMENT
+================================================================================
+
+Last Updated: April 2026
+Project: CampusCore ERP - FSAD Project
