@@ -43,11 +43,18 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- MySQL Driver (same style as Another Project backend) -->
+        <!-- MySQL Driver (local development) -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <version>8.2.0</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- PostgreSQL Driver (Render deployment) -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
 
