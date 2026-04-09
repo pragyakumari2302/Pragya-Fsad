@@ -1,0 +1,16 @@
+{
+  "stats": {
+    "students": 1526,
+    "teachers": 96,
+    "departments": 14,
+    "courses": 182
+  },
+  "recentActivity": [
+    { "id": 1, "action": "New enrollment", "detail": "Riya Sen enrolled in CSE201", "time": "35 minutes ago" },
+    { "id": 2, "action": "Grade submission", "detail": "Prof. Mehta submitted DBMS midterm grades", "time": "2 hours ago" },
+    { "id": 3, "action": "Fee payment", "detail": "74 students completed fee payment", "time": "5 hours ago" },
+    { "id": 4, "action": "Library issue", "detail": "12 new books issued in CSE department", "time": "1 day ago" },
+    { "id": 5, "action": "New course", "detail": "Cloud Computing added to catalog", "time": "2 days ago" },
+    { "id": 6, "action": "Attendance alert", "detail": "CSE213 attendance below 85%", "time": "3 days ago" }
+  ]
+}

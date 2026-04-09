@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1,
+    "code": "CSE201",
+    "title": "Data Structures and Algorithms",
+    "credits": 4,
+    "semester": "Spring 2026",
+    "instructor": "Dr. Sana Qureshi",
+    "schedule": "Mon, Wed 09:40 - 11:40",
+    "room": "CSE Lab 2",
+    "status": "Active",
+    "seats": "58/60"
+  },
+  {
+    "id": 2,
+    "code": "CSE205",
+    "title": "Database Management Systems",
+    "credits": 3,
+    "semester": "Spring 2026",
+    "instructor": "Prof. Arjun Mehta",
+    "schedule": "Tue, Thu 11:50 - 13:50",
+    "room": "Room 214",
+    "status": "Active",
+    "seats": "54/60"
+  },
+  {
+    "id": 3,
+    "code": "CSE209",
+    "title": "Operating Systems",
+    "credits": 3,
+    "semester": "Spring 2026",
+    "instructor": "Dr. Fatima Noor",
+    "schedule": "Mon, Wed 14:00 - 16:00",
+    "room": "Room 302",
+    "status": "Active",
+    "seats": "60/60"
+  },
+  {
+    "id": 4,
+    "code": "CSE213",
+    "title": "Computer Networks",
+    "credits": 3,
+    "semester": "Spring 2026",
+    "instructor": "Prof. Hasan Raza",
+    "schedule": "Tue, Thu 07:30 - 09:30",
+    "room": "Room 108",
+    "status": "Active",
+    "seats": "49/60"
+  },
+  {
+    "id": 5,
+    "code": "CSE217",
+    "title": "Machine Learning Fundamentals",
+    "credits": 4,
+    "semester": "Spring 2026",
+    "instructor": "Dr. Priya Nair",
+    "schedule": "Fri 09:40 - 13:50",
+    "room": "AI Lab",
+    "status": "Active",
+    "seats": "45/50"
+  },
+  {
+    "id": 6,
+    "code": "CSE221",
+    "title": "Software Engineering",
+    "credits": 3,
+    "semester": "Spring 2026",
+    "instructor": "Prof. Omar Siddiq",
+    "schedule": "Mon 07:30 - 09:30",
+    "room": "Room 210",
+    "status": "Active",
+    "seats": "52/60"
+  },
+  {
+    "id": 7,
+    "code": "CSE223",
+    "title": "Human-Computer Interaction",
+    "credits": 2,
+    "semester": "Spring 2026",
+    "instructor": "Dr. Aisha Rahman",
+    "schedule": "Thu 14:00 - 16:00",
+    "room": "Design Studio",
+    "status": "Active",
+    "seats": "38/45"
+  },
+  {
+    "id": 8,
+    "code": "CSE225",
+    "title": "Cloud Computing",
+    "credits": 3,
+    "semester": "Spring 2026",
+    "instructor": "Prof. Imran Ali",
+    "schedule": "Wed 11:50 - 13:50",
+    "room": "Room 215",
+    "status": "Active",
+    "seats": "41/60"
+  }
+]

@@ -1,0 +1,16 @@
+:root {
+  /* Premium SaaS Dark Theme Specification */
+  --primary: #6366F1;       /* Indigo */
+  --primary-hover: #4F46E5; /* Indigo slightly darker */
+  --secondary: #8B5CF6;     /* Violet */
+  --accent: #22C55E;        /* Green */
+  
+  --bg: #0F172A;            /* Dark Navy */
+  --surface: #1E293B;       /* Card background */
+  
+  --text-main: #F8FAFC;     /* Light text on dark */
+  --text-light: #94A3B8;    /* Muted text on dark */
+  
+  --border: rgba(255, 255, 255, 0.05); /* Very subtle white border */
+  --radius: 12px;
+}

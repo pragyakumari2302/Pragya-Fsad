@@ -4,32 +4,103 @@
 ================================================================================
 
 PROJECT NAME: CampusCore ERP (FSAD Project)
-STACK:        React 19 + Vite (Frontend)  |  Spring Boot 3 + MySQL (Backend)
-SCHEMA:       MySQL database "adnan"
+STACK:        React 19 + Vite (Frontend)  |  Spring Boot 3 + H2/MySQL (Backend)
+SCHEMA:       H2 in-memory (default) or MySQL database "pragya"
 VERSION:      3.0 (Full-Stack Admin God-Mode Edition)
 
 ================================================================================
                             HOW TO RUN
 ================================================================================
 
-1) START THE BACKEND (Spring Boot on port 8080):
-   - Open terminal in the "backend" folder
-   - Run:  mvn spring-boot:run
-     (if mvn not on PATH, use full path to maven, e.g.:
-      $env:PATH = "C:\Users\adnan\.maven\maven-3.9.13\bin;$env:PATH"; mvn spring-boot:run)
-   - Wait until you see "Started ErpBackendApplication" in the console
-   - Backend will be live at: http://localhost:8080
+────────────────────────────────────────────────────────────────────────────────
+  OPTION A:  ONE-CLICK START (RECOMMENDED)
+────────────────────────────────────────────────────────────────────────────────
 
-2) START THE FRONTEND (Vite dev server on port 5173):
-   - Open a separate terminal in the "FSAD_PROJECT" folder
-   - Run:  npm run dev
-     (if execution policy blocks it:
-      powershell -ExecutionPolicy Bypass -Command "npm run dev")
-   - Frontend will be live at: http://localhost:5173
+  Run a SINGLE PowerShell command from the project root:
 
-3) OPEN IN BROWSER:
-   - Navigate to http://localhost:5173
-   - You will see the Login page
+      powershell -ExecutionPolicy Bypass -File .\start-all.ps1
+
+  This script automatically does ALL of the following:
+    1. Starts the Spring Boot backend on port 9090
+    2. Waits for the backend to be healthy
+    3. Creates a Cloudflare quick-tunnel to localhost:9090
+    4. Extracts the public tunnel URL (https://xxxx.trycloudflare.com)
+    5. Writes VITE_API_URL into FSAD_PROJECT/.env with the tunnel URL
+    6. Starts the Vite frontend dev server on port 5173
+
+  After startup you will see a summary box like:
+  ╔══════════════════════════════════════════════════════════╗
+  ║  Backend  : http://localhost:9090                       ║
+  ║  Frontend : http://localhost:5173                       ║
+  ║  Tunnel   : https://xxxx-yyyy.trycloudflare.com        ║
+  ║  API URL  : https://xxxx-yyyy.trycloudflare.com/api    ║
+  ╚══════════════════════════════════════════════════════════╝
+
+  To STOP all services:  Press Ctrl+C in the same terminal
+    → The script automatically kills all processes
+    → Resets .env back to localhost for local-only dev
+
+  You can also force-stop everything at any time with:
+      powershell -ExecutionPolicy Bypass -File .\stop-all.ps1
+
+  PREREQUISITES for Option A:
+    - Java 17+ and Maven (mvn) on PATH
+    - Node.js / npm on PATH
+    - Cloudflare Tunnel CLI:  winget install cloudflare.cloudflared
+
+────────────────────────────────────────────────────────────────────────────────
+  OPTION B:  MANUAL START (3 separate terminals)
+────────────────────────────────────────────────────────────────────────────────
+
+  1) START THE BACKEND (Spring Boot on port 9090):
+     - Open terminal in the "backend" folder
+     - Run:  mvn spring-boot:run
+       (if mvn not on PATH, use full path to maven, e.g.:
+        $env:PATH = "C:\Users\pragya\.maven\maven-3.9.13\bin;$env:PATH"; mvn spring-boot:run)
+     - Wait until you see "Started ErpBackendApplication" in the console
+     - Backend will be live at: http://localhost:9090
+
+  2) START THE FRONTEND (Vite dev server on port 5173):
+     - Open a separate terminal in the "FSAD_PROJECT" folder
+     - Run:  npm run dev
+       (if execution policy blocks it:
+        powershell -ExecutionPolicy Bypass -Command "npm run dev")
+     - Frontend will be live at: http://localhost:5173
+
+  3) OPEN IN BROWSER:
+     - Navigate to http://localhost:5173
+     - You will see the Login page
+
+  NOTE: With manual start, .env defaults to http://localhost:9090/api.
+        No Cloudflare tunnel is created. This is fine for local development.
+
+────────────────────────────────────────────────────────────────────────────────
+  CLOUDFLARE TUNNEL & DEPLOYMENT NOTES
+────────────────────────────────────────────────────────────────────────────────
+
+  WHY CLOUDFLARE TUNNEL?
+    The backend runs on your local machine, but external users or deployed
+    frontends cannot reach localhost:9090. Cloudflare Tunnel creates a free,
+    temporary public URL (https://xxxx.trycloudflare.com) that routes
+    internet traffic to your local backend — no port forwarding, no firewall
+    changes, no cloud server needed.
+
+  HOW IT WORKS:
+    start-all.ps1  →  runs `cloudflared tunnel --url http://localhost:9090`
+                   →  parses the generated URL from cloudflared logs
+                   →  writes it to FSAD_PROJECT/.env as VITE_API_URL
+                   →  Vite picks up .env and all API calls use the tunnel
+
+  ENVIRONMENT VARIABLE:
+    File:     FSAD_PROJECT/.env
+    Variable: VITE_API_URL
+    Example:  VITE_API_URL=https://random-name.trycloudflare.com/api
+
+    All API calls in the frontend read from import.meta.env.VITE_API_URL.
+    This includes mockApi.js, Login.jsx, Signup.jsx, and Profile.jsx.
+
+  IMPORTANT: The tunnel URL changes every time you restart cloudflared.
+    start-all.ps1 handles this automatically by rewriting .env each time.
 
 ================================================================================
                        MASTER PASSWORD & CREDENTIALS
@@ -170,7 +241,7 @@ Exams / Reports / Dashboard:
   GET /api/dashboard
 
 ================================================================================
-                        DATABASE (MySQL Schema: "adnan")
+                        DATABASE (MySQL Schema: "pragya")
 ================================================================================
 
 Tables auto-created by Hibernate on startup:
@@ -197,24 +268,32 @@ All tables are auto-seeded with robust demo data on first startup via:
                           PROJECT STRUCTURE
 ================================================================================
 
-Adnan/
-├── FSAD_PROJECT/              ← React Frontend
+pragya/
+├── start-all.ps1              ← ONE-CLICK: starts backend + tunnel + frontend
+├── stop-all.ps1               ← ONE-CLICK: kills all services, resets .env
+├── start.txt                  ← THIS FILE (documentation)
+├── patch.js                   ← Utility patch script
+│
+├── FSAD_PROJECT/              ← React Frontend (Vite)
+│   ├── .env                   ← VITE_API_URL (auto-updated by start-all.ps1)
 │   ├── src/
-│   │   ├── api/mockApi.js     ← Master API client mapping to all backend paths
+│   │   ├── api/mockApi.js     ← Master API client (reads VITE_API_URL)
 │   │   ├── app/App.jsx        ← Root component with routing
 │   │   ├── app/routes.jsx     ← All page routes
 │   │   ├── components/        ← UI components (Layout, Sidebar, Navbar)
 │   │   ├── context/           ← AuthContext for JWT session
 │   │   ├── pages/             ← All page components
 │   │   │   ├── AdminDashboard.jsx ← (NEW) Independent Admin God-Mode Interface
-│   │   │   ├── Login.jsx
-│   │   │   ├── Signup.jsx
+│   │   │   ├── Login.jsx      ← Uses VITE_API_URL for auth
+│   │   │   ├── Signup.jsx     ← Uses VITE_API_URL for auth
+│   │   │   ├── Profile.jsx    ← Uses VITE_API_URL for password change
 │   │   │   ├── AcademicRegistration.jsx (Interactive)
 │   │   │   └── (... other student/teacher pages)
+│   ├── vite.config.js
 │   └── package.json
 │
-├── backend/                   ← Spring Boot Backend
-│   ├── src/main/java/com/adnan/erp/
+├── backend/                   ← Spring Boot Backend (port 9090)
+│   ├── src/main/java/com/pragya/erp/
 │   │   ├── ErpBackendApplication.java
 │   │   ├── config/
 │   │   │   ├── SecurityConfig.java
@@ -236,10 +315,9 @@ Adnan/
 │   │       ├── JwtUtil.java
 │   │       └── JwtAuthenticationFilter.java
 │   └── src/main/resources/
-│       └── application.properties      ← MySQL connection logic
+│       └── application.properties      ← DB + CORS + JWT config (port 9090)
 │
-├── Another Project/           ← PathWise (reference inspiration)
-└── start.txt                  ← THIS FILE
+└── Another Project/           ← PathWise (reference inspiration)
 
 ================================================================================
                                END OF DOCUMENT
@@ -247,3 +325,4 @@ Adnan/
 
 Last Updated: April 2026
 Project: CampusCore ERP - FSAD Project
+

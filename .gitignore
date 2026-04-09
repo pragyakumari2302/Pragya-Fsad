@@ -1,2 +1,13 @@
 # Build outputs
 backend/target/
+
+# Node
+FSAD_PROJECT/node_modules/
+FSAD_PROJECT/dist/
+
+# Logs
+*.log
+.cloudflared-tunnel.log
+
+# IDE
+.vscode/

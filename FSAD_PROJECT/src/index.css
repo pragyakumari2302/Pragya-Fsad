@@ -1,0 +1,69 @@
+@import "tailwindcss";
+@import "./assets/styles/variables.css";
+@import "./assets/styles/global.css";
+
+:root {
+  --color-ink: #0f172a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+html {
+  font-feature-settings: "rlig" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth transitions for sidebar */
+.transition-sidebar {
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    padding 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s ease;
+}
+
+/* Focus ring for accessibility */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Custom float animations */
+@keyframes float {
+  0% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-30px) scale(1.05); }
+  100% { transform: translateY(0px) scale(1); }
+}
+
+@keyframes float-delayed {
+  0% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(30px) scale(0.95); }
+  100% { transform: translateY(0px) scale(1); }
+}
+
+.animate-float {
+  animation: float 15s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-delayed 18s ease-in-out infinite backwards;
+}
+
+html.light-mode {
+  filter: invert(1) hue-rotate(180deg);
+  background-color: #f0f0f0;
+}
+
+html.light-mode img, 
+html.light-mode video, 
+html.light-mode iframe,
+html.light-mode .lucide {
+  filter: invert(1) hue-rotate(180deg);
+}

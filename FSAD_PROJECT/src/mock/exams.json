@@ -1,0 +1,63 @@
+{
+  "upcoming": [
+    {
+      "id": 1,
+      "course": "CSE201",
+      "title": "Data Structures Midterm",
+      "date": "2026-03-05",
+      "time": "09:00 - 11:00",
+      "room": "Exam Hall A",
+      "type": "Midterm",
+      "syllabus": "Stacks, Queues, Trees"
+    },
+    {
+      "id": 2,
+      "course": "CSE205",
+      "title": "DBMS Quiz 2",
+      "date": "2026-03-08",
+      "time": "11:30 - 12:30",
+      "room": "Room 214",
+      "type": "Quiz",
+      "syllabus": "SQL Joins, Indexing"
+    },
+    {
+      "id": 3,
+      "course": "CSE213",
+      "title": "Computer Networks Lab Test",
+      "date": "2026-03-12",
+      "time": "14:00 - 16:00",
+      "room": "Net Lab 1",
+      "type": "Lab",
+      "syllabus": "Subnetting, Routing"
+    }
+  ],
+  "results": [
+    {
+      "id": 1,
+      "course": "CSE209",
+      "exam": "Operating Systems Quiz 1",
+      "score": 18,
+      "total": 20,
+      "grade": "A",
+      "published": "2026-02-18"
+    },
+    {
+      "id": 2,
+      "course": "CSE221",
+      "exam": "Software Engineering Assignment 1",
+      "score": 27,
+      "total": 30,
+      "grade": "A-",
+      "published": "2026-02-12"
+    },
+    {
+      "id": 3,
+      "course": "CSE217",
+      "exam": "Machine Learning Quiz 1",
+      "score": 15,
+      "total": 20,
+      "grade": "B+",
+      "published": "2026-02-09"
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "name": "Pragya",
+    "email": "pragya@campus.edu",
+    "role": "Student",
+    "department": "Computer Science",
+    "status": "active",
+    "joinedAt": "2023-09-01"
+  },
+  {
+    "id": 2,
+    "name": "Rahul Sharma",
+    "email": "rahul.sharma@campus.edu",
+    "role": "Teacher",
+    "department": "Mathematics",
+    "status": "active",
+    "joinedAt": "2019-08-15"
+  },
+  {
+    "id": 3,
+    "name": "Fatima Ali",
+    "email": "fatima.ali@campus.edu",
+    "role": "Admin",
+    "department": "Administration",
+    "status": "active",
+    "joinedAt": "2020-01-10"
+  },
+  {
+    "id": 4,
+    "name": "Priya Patel",
+    "email": "priya.patel@campus.edu",
+    "role": "Student",
+    "department": "Business",
+    "status": "active",
+    "joinedAt": "2024-01-15"
+  },
+  {
+    "id": 5,
+    "name": "Dr. Suresh Kumar",
+    "email": "suresh.kumar@campus.edu",
+    "role": "Teacher",
+    "department": "Physics",
+    "status": "active",
+    "joinedAt": "2017-07-01"
+  },
+  {
+    "id": 6,
+    "name": "Ananya Singh",
+    "email": "ananya.singh@campus.edu",
+    "role": "Student",
+    "department": "Computer Science",
+    "status": "inactive",
+    "joinedAt": "2022-09-01"
+  },
+  {
+    "id": 7,
+    "name": "Arif Mahmud",
+    "email": "arif.mahmud@campus.edu",
+    "role": "Student",
+    "department": "Computer Science",
+    "status": "active",
+    "joinedAt": "2025-08-12"
+  },
+  {
+    "id": 8,
+    "name": "Neha Iyer",
+    "email": "neha.iyer@campus.edu",
+    "role": "Teacher",
+    "department": "Computer Science",
+    "status": "active",
+    "joinedAt": "2018-06-10"
+  },
+  {
+    "id": 9,
+    "name": "Karan Verma",
+    "email": "karan.verma@campus.edu",
+    "role": "Student",
+    "department": "Mechanical",
+    "status": "active",
+    "joinedAt": "2024-08-20"
+  },
+  {
+    "id": 10,
+    "name": "Sara Najeeb",
+    "email": "sara.najeeb@campus.edu",
+    "role": "Staff",
+    "department": "Library",
+    "status": "active",
+    "joinedAt": "2021-04-05"
+  }
+]

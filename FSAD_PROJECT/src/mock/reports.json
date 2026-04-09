@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "title": "Enrollment Summary Q1 2025",
+    "type": "Enrollment",
+    "generatedAt": "2025-01-15",
+    "status": "completed",
+    "records": 1247,
+    "format": "PDF"
+  },
+  {
+    "id": 2,
+    "title": "Department-wise Intake 2025",
+    "type": "Admissions",
+    "generatedAt": "2025-02-02",
+    "status": "completed",
+    "records": 356,
+    "format": "Excel"
+  },
+  {
+    "id": 3,
+    "title": "Faculty Performance Report",
+    "type": "Academic",
+    "generatedAt": "2025-01-10",
+    "status": "completed",
+    "records": 89,
+    "format": "Excel"
+  },
+  {
+    "id": 4,
+    "title": "Attendance Analysis December 2024",
+    "type": "Attendance",
+    "generatedAt": "2025-01-05",
+    "status": "completed",
+    "records": 3420,
+    "format": "PDF"
+  },
+  {
+    "id": 5,
+    "title": "Fee Collection Report",
+    "type": "Financial",
+    "generatedAt": "2025-01-20",
+    "status": "pending",
+    "records": 0,
+    "format": "PDF"
+  },
+  {
+    "id": 6,
+    "title": "Scholarship Utilization 2024-25",
+    "type": "Financial",
+    "generatedAt": "2025-01-28",
+    "status": "completed",
+    "records": 212,
+    "format": "PDF"
+  },
+  {
+    "id": 7,
+    "title": "Library Circulation Summary",
+    "type": "Library",
+    "generatedAt": "2025-01-30",
+    "status": "completed",
+    "records": 486,
+    "format": "Excel"
+  },
+  {
+    "id": 8,
+    "title": "Placement Outcomes 2024-25",
+    "type": "Career Services",
+    "generatedAt": "2025-02-05",
+    "status": "completed",
+    "records": 132,
+    "format": "PDF"
+  }
+]
