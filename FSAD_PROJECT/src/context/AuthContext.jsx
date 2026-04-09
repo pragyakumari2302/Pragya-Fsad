@@ -29,6 +29,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("cc_user");
     localStorage.removeItem("cc_auth");
+    localStorage.removeItem("cc_demo");
+    localStorage.removeItem("jwtToken");
   };
 
   return (

@@ -19,6 +19,14 @@ export default function Login() {
     await handleLoginRequest(demoEmail, demoPassword);
   };
 
+  /* ---------- Demo / offline accounts (used when backend is unreachable) ---------- */
+  const DEMO_ACCOUNTS = {
+    "student@campuscore.edu":  { id: 1, name: "Demo Student",  email: "student@campuscore.edu",  role: "Student" },
+    "teacher@campuscore.edu":  { id: 2, name: "Demo Teacher",  email: "teacher@campuscore.edu",  role: "Teacher" },
+    "admin@campuscore.edu":    { id: 3, name: "Demo Admin",    email: "admin@campuscore.edu",    role: "Admin" },
+  };
+  const DEMO_PASSWORD = "1234";
+
   const handleLoginRequest = async (emailValue, passwordValue) => {
     setError("");
 
@@ -27,13 +35,19 @@ export default function Login() {
       return;
     }
 
+    /* --- 1. Try the real backend first --- */
     try {
       const API = import.meta.env.VITE_API_URL || "http://localhost:9090/api";
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);   // 5 s timeout
+
       const res = await fetch(`${API}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: emailValue, password: passwordValue })
+        body: JSON.stringify({ email: emailValue, password: passwordValue }),
+        signal: controller.signal,
       });
+      clearTimeout(timeout);
 
       const data = await res.json().catch(() => ({}));
 
@@ -52,9 +66,24 @@ export default function Login() {
         redirectTo = location.state?.from?.pathname || "/";
       }
       navigate(redirectTo, { replace: true });
-    } catch (err) {
-      console.error("Login failed", err);
-      setError("Unable to reach the authentication server.");
+      return;
+    } catch (_networkErr) {
+      console.warn("Backend unreachable — falling back to demo mode", _networkErr);
+    }
+
+    /* --- 2. Fallback: demo / offline login --- */
+    const demoUser = DEMO_ACCOUNTS[emailValue.toLowerCase()];
+    if (demoUser && passwordValue === DEMO_PASSWORD) {
+      localStorage.setItem("jwtToken", "demo-token");
+      localStorage.setItem("cc_demo", "true");          // flag for mock API layer
+      login(demoUser);
+
+      let redirectTo = "/";
+      if (demoUser.role === "Admin") redirectTo = "/admin";
+      else redirectTo = location.state?.from?.pathname || "/";
+      navigate(redirectTo, { replace: true });
+    } else {
+      setError("Backend is offline. Use demo credentials (student@campuscore.edu / 1234).");
     }
   };
 
