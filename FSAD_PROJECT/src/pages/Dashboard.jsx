@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fetchDashboard, fetchEnrollmentsByStudent, fetchCourses, fetchAttendanceByStudent, fetchMarksByStudent } from "../api/mockApi";
+import { fetchDashboard, fetchEnrollmentsByStudent, fetchCourses, fetchAttendanceByStudent, fetchMarksByStudent, fetchUsers, fetchTimetableByTeacher } from "../api/mockApi";
 import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
 import Loader from "../components/ui/Loader";
@@ -171,15 +171,63 @@ function StudentDashboard() {
 }
 
 function TeacherDashboard() {
+  const { user } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [studentCount, setStudentCount] = useState(0);
+  const [classes, setClasses] = useState([]);
 
   useEffect(() => {
-    fetchDashboard().then(res => {
-      setData(res);
-      setLoading(false);
-    });
-  }, []);
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const [dashRes, usersRes] = await Promise.all([
+          fetchDashboard(),
+          fetchCourses()
+        ]);
+        if (!cancelled) {
+          setData(dashRes);
+          // Try to get student count from users API (teacher sees only assigned students)
+          try {
+            const users = await fetchUsers();
+            if (Array.isArray(users)) {
+              setStudentCount(users.filter(u => u.role === "Student").length);
+            }
+          } catch { /* fallback */ }
+          // Try to load timetable for teacher
+          try {
+            const timetable = await fetchTimetableByTeacher(user.id);
+            if (Array.isArray(timetable) && timetable.length > 0) {
+              const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+              const todayClasses = timetable
+                .filter(t => t.day === today)
+                .map(t => ({ time: t.timeSlot, class: t.courseTitle || t.courseCode, room: t.roomNumber }));
+              setClasses(todayClasses.length > 0 ? todayClasses : [
+                { time: "No classes", class: "No classes scheduled for today", room: "-" }
+              ]);
+            } else {
+              setClasses([
+                { time: "10:00 AM", class: "Advanced Algorithms", room: "Lecture Hall A" },
+                { time: "01:00 PM", class: "Discrete Math", room: "Room 204" }
+              ]);
+            }
+          } catch {
+            setClasses([
+              { time: "10:00 AM", class: "Advanced Algorithms", room: "Lecture Hall A" },
+              { time: "01:00 PM", class: "Discrete Math", room: "Room 204" }
+            ]);
+          }
+        }
+      } catch (err) {
+        console.error("Teacher dashboard load failed:", err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   if (loading) return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 animate-pulse">
@@ -201,20 +249,15 @@ function TeacherDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <StatCard title="Total Students" value={stats.students ?? 124} Icon={Users} />
-        <StatCard title="Classes Today" value={3} Icon={Calendar} iconColor="text-sky-400" iconBg="bg-sky-500/10" delay={0.1} />
+        <StatCard title="My Students" value={studentCount || stats.students || 0} Icon={Users} />
+        <StatCard title="Classes Today" value={classes.length} Icon={Calendar} iconColor="text-sky-400" iconBg="bg-sky-500/10" delay={0.1} />
         <StatCard title="Pending Grades" value={42} Icon={Award} iconColor="text-amber-400" iconBg="bg-amber-500/10" delay={0.2} />
         <StatCard title="Avg Attendance" value="88%" trend="-1.5%" trendUp={false} Icon={CheckCircle} iconColor="text-emerald-400" iconBg="bg-emerald-500/10" delay={0.3} progress={88} />
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
          <div className="xl:col-span-2 space-y-6">
-            <ClassesList 
-               classes={[
-                  { time: "10:00 AM", class: "Advanced Algorithms", room: "Lecture Hall A" },
-                  { time: "01:00 PM", class: "Discrete Math", room: "Room 204" }
-               ]} 
-            />
+            <ClassesList classes={classes} />
          </div>
          <div>
             <div className="h-full min-h-[400px]">

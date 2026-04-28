@@ -1,49 +1,127 @@
 import { useState, useEffect } from "react";
 import { Calendar, Clock, MapPin, Download } from "lucide-react";
+import { fetchTimetable, fetchTimetableBySection, fetchTimetableByTeacher } from "../api/mockApi";
+import { useAuth } from "../context/AuthContext";
 import Loader from "../components/ui/Loader";
 
+// Hardcoded fallback data (used when API returns empty)
+const FALLBACK_DATA = {
+  week: "Week of Feb 24 - Mar 2, 2026",
+  days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  timeSlots: ["07:30 - 09:30", "09:40 - 11:40", "11:50 - 13:50", "14:00 - 16:00"],
+  subjects: {
+    CSE201: { title: "Data Structures", room: "CSE Lab 2", color: "from-blue-500/20 to-indigo-500/20 text-indigo-300 border-indigo-500/30" },
+    CSE205: { title: "DBMS", room: "Room 214", color: "from-emerald-500/20 to-teal-500/20 text-emerald-300 border-emerald-500/30" },
+    CSE209: { title: "Operating Systems", room: "Room 302", color: "from-orange-500/20 to-red-500/20 text-orange-300 border-orange-500/30" },
+    CSE213: { title: "Networks", room: "Room 108", color: "from-violet-500/20 to-purple-500/20 text-violet-300 border-violet-500/30" },
+    CSE217: { title: "Machine Learning", room: "AI Lab", color: "from-rose-500/20 to-pink-500/20 text-rose-300 border-rose-500/30" },
+    CSE221: { title: "Software Eng.", room: "Room 210", color: "from-cyan-500/20 to-blue-500/20 text-cyan-300 border-cyan-500/30" },
+    CSE223: { title: "HCI", room: "Design Studio", color: "from-fuchsia-500/20 to-purple-500/20 text-fuchsia-300 border-fuchsia-500/30" },
+    CSE225: { title: "Cloud Computing", room: "Room 215", color: "from-amber-500/20 to-yellow-500/20 text-amber-300 border-amber-500/30" }
+  },
+  schedule: {
+    Monday: ["CSE221", "CSE201", "CSE205", "CSE209"],
+    Tuesday: ["CSE213", "CSE205", "CSE223", "CSE217"],
+    Wednesday: ["CSE201", "CSE225", "CSE209", "CSE221"],
+    Thursday: ["CSE213", "CSE205", "CSE223", "CSE217"],
+    Friday: ["CSE201", "CSE225", "CSE209", "CSE221"],
+    Saturday: ["CSE217", "CSE213", "CSE205", "CSE223"]
+  }
+};
+
+const COLORS = [
+  "from-blue-500/20 to-indigo-500/20 text-indigo-300 border-indigo-500/30",
+  "from-emerald-500/20 to-teal-500/20 text-emerald-300 border-emerald-500/30",
+  "from-orange-500/20 to-red-500/20 text-orange-300 border-orange-500/30",
+  "from-violet-500/20 to-purple-500/20 text-violet-300 border-violet-500/30",
+  "from-rose-500/20 to-pink-500/20 text-rose-300 border-rose-500/30",
+  "from-cyan-500/20 to-blue-500/20 text-cyan-300 border-cyan-500/30",
+  "from-fuchsia-500/20 to-purple-500/20 text-fuchsia-300 border-fuchsia-500/30",
+  "from-amber-500/20 to-yellow-500/20 text-amber-300 border-amber-500/30"
+];
+
+function buildTimetableFromApi(entries) {
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const slotSet = new Set();
+  const subjects = {};
+  const schedule = {};
+
+  days.forEach(d => { schedule[d] = []; });
+
+  // Build subject map with colors
+  let colorIdx = 0;
+  entries.forEach(entry => {
+    if (entry.courseCode && !subjects[entry.courseCode]) {
+      subjects[entry.courseCode] = {
+        title: entry.courseTitle || entry.courseCode,
+        room: entry.roomNumber || "-",
+        color: COLORS[colorIdx % COLORS.length]
+      };
+      colorIdx++;
+    }
+    slotSet.add(entry.timeSlot);
+  });
+
+  const timeSlots = Array.from(slotSet).sort();
+
+  // Build schedule grid
+  days.forEach(day => {
+    const dayEntries = entries.filter(e => e.day === day);
+    timeSlots.forEach(slot => {
+      const match = dayEntries.find(e => e.timeSlot === slot);
+      schedule[day].push(match ? match.courseCode : null);
+    });
+  });
+
+  return {
+    week: "Current Semester Schedule",
+    days: days.filter(d => entries.some(e => e.day === d)),
+    timeSlots,
+    subjects,
+    schedule
+  };
+}
+
 export default function Timetable() {
+  const { user } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    setTimeout(() => {
-      if (!cancelled) {
-        setData({
-          week: "Week of Feb 24 - Mar 2, 2026",
-          days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-          timeSlots: [
-            "07:30 - 09:30",
-            "09:40 - 11:40",
-            "11:50 - 13:50",
-            "14:00 - 16:00"
-          ],
-          subjects: {
-            CSE201: { title: "Data Structures", room: "CSE Lab 2", color: "from-blue-500/20 to-indigo-500/20 text-indigo-300 border-indigo-500/30" },
-            CSE205: { title: "DBMS", room: "Room 214", color: "from-emerald-500/20 to-teal-500/20 text-emerald-300 border-emerald-500/30" },
-            CSE209: { title: "Operating Systems", room: "Room 302", color: "from-orange-500/20 to-red-500/20 text-orange-300 border-orange-500/30" },
-            CSE213: { title: "Networks", room: "Room 108", color: "from-violet-500/20 to-purple-500/20 text-violet-300 border-violet-500/30" },
-            CSE217: { title: "Machine Learning", room: "AI Lab", color: "from-rose-500/20 to-pink-500/20 text-rose-300 border-rose-500/30" },
-            CSE221: { title: "Software Eng.", room: "Room 210", color: "from-cyan-500/20 to-blue-500/20 text-cyan-300 border-cyan-500/30" },
-            CSE223: { title: "HCI", room: "Design Studio", color: "from-fuchsia-500/20 to-purple-500/20 text-fuchsia-300 border-fuchsia-500/30" },
-            CSE225: { title: "Cloud Computing", room: "Room 215", color: "from-amber-500/20 to-yellow-500/20 text-amber-300 border-amber-500/30" }
-          },
-          schedule: {
-            Monday: ["CSE221", "CSE201", "CSE205", "CSE209"],
-            Tuesday: ["CSE213", "CSE205", "CSE223", "CSE217"],
-            Wednesday: ["CSE201", "CSE225", "CSE209", "CSE221"],
-            Thursday: ["CSE213", "CSE205", "CSE223", "CSE217"],
-            Friday: ["CSE201", "CSE225", "CSE209", "CSE221"],
-            Saturday: ["CSE217", "CSE213", "CSE205", "CSE223"]
-          }
-        });
-        setLoading(false);
-      }
-    }, 500);
 
+    const load = async () => {
+      setLoading(true);
+      try {
+        let entries = [];
+        // Fetch based on role
+        if (user?.role === "Student" && user?.section) {
+          entries = await fetchTimetableBySection(user.section);
+        } else if (user?.role === "Teacher") {
+          entries = await fetchTimetableByTeacher(user.id);
+        } else {
+          entries = await fetchTimetable();
+        }
+
+        if (!cancelled) {
+          if (entries && entries.length > 0) {
+            setData(buildTimetableFromApi(entries));
+          } else {
+            // Fallback to hardcoded data
+            setData(FALLBACK_DATA);
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to fetch timetable from API, using fallback:", err);
+        if (!cancelled) setData(FALLBACK_DATA);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    load();
     return () => { cancelled = true; };
-  }, []);
+  }, [user?.id, user?.role, user?.section]);
 
   if (loading) return <div className="flex justify-center items-center h-64"><Loader /></div>;
 
@@ -71,7 +149,7 @@ export default function Timetable() {
             <Clock className="text-indigo-400 w-5 h-5"/>
             Weekly Schedule
           </h2>
-          <span className="text-xs text-slate-500">Each slot is 2 hours (10m break)</span>
+          <span className="text-xs text-slate-500">Dynamic from database</span>
         </div>
         
         <div className="overflow-x-auto">

@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import * as api from "../api/mockApi";
 
 const cardStyle = { background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 24, backdropFilter: "blur(10px)" };
-const inputStyle = { width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.07)", color: "#fff", fontSize: 14, outline: "none", boxSizing: "border-box" };
+const inputStyle = { width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)", background: "#1e2540", color: "#fff", fontSize: 14, outline: "none", boxSizing: "border-box" };
 const btnPrimary = { padding: "10px 20px", borderRadius: 10, border: "none", background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 14 };
 const btnDanger = { ...btnPrimary, background: "linear-gradient(135deg, #ef4444, #dc2626)" };
 const btnSmall = { padding: "6px 12px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 };
@@ -67,6 +67,7 @@ export default function AdminDashboard() {
   const [showAddBook, setShowAddBook] = useState(false);
   const [showEditUser, setShowEditUser] = useState(null);
   const [showEditCourse, setShowEditCourse] = useState(null);
+  const [showStudentDetail, setShowStudentDetail] = useState(null);
 
   const [showAddEnrollment, setShowAddEnrollment] = useState(false);
   const [showAddAttendance, setShowAddAttendance] = useState(false);
@@ -221,7 +222,7 @@ export default function AdminDashboard() {
   const handleReturnIssue = async (id) => { try { await api.returnLibraryBook(id); showToast("Returned"); loadData(); } catch { showToast("Failed", "error"); } };
   const handleDeleteIssue = async (id) => { if (!window.confirm("Delete?")) return; try { await api.deleteLibraryIssue(id); showToast("Deleted"); loadData(); } catch { showToast("Failed", "error"); } };
 
-  const startEditUser = (u) => { setShowEditUser(u); setEditUserForm({ name: u.name, email: u.email, role: u.role, department: u.department, status: u.status }); };
+  const startEditUser = (u) => { setShowEditUser(u); setEditUserForm({ name: u.name, email: u.email, role: u.role, department: u.department, status: u.status, section: u.section || "", teacherId: u.teacherId || "" }); };
   const handleSaveEditUser = async () => {
     try { await api.updateUser(showEditUser.id, editUserForm); showToast("User updated"); setShowEditUser(null); loadData(); }
     catch { showToast("Failed", "error"); }
@@ -245,6 +246,7 @@ export default function AdminDashboard() {
     { id: "marks", label: "📝 Marks", icon: "📝" },
     { id: "fees", label: "💰 Fees", icon: "💰" },
     { id: "library", label: "📖 Library", icon: "📖" },
+    { id: "timetable", label: "📅 Timetable", icon: "📅" },
     { id: "database", label: "🗄️ Database View", icon: "🗄️" },
     { id: "profile", label: "👤 Profile", icon: "👤" },
   ];
@@ -321,13 +323,16 @@ export default function AdminDashboard() {
             </div>
             <div style={cardStyle}>
               <table style={tableStyle}>
-                <thead><tr><th style={thStyle}>Name</th><th style={thStyle}>Email</th><th style={thStyle}>Department</th><th style={thStyle}>Status</th><th style={thStyle}>Actions</th></tr></thead>
+                <thead><tr><th style={thStyle}>Name</th><th style={thStyle}>Email</th><th style={thStyle}>Department</th><th style={thStyle}>Status</th><th style={thStyle}>Section</th><th style={thStyle}>Teacher</th><th style={thStyle}>Actions</th></tr></thead>
                 <tbody>
                   {students.map(s => (
                     <tr key={s.id}>
                       <td style={tdStyle}>{s.name}</td><td style={tdStyle}>{s.email}</td><td style={tdStyle}>{s.department || "-"}</td>
                       <td style={tdStyle}><span style={{ padding: "4px 10px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: s.status === "active" ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", color: s.status === "active" ? "#22c55e" : "#ef4444" }}>{s.status}</span></td>
+                      <td style={tdStyle}>{s.section || "-"}</td>
+                      <td style={tdStyle}>{s.teacherId ? teachers.find(t => t.id === s.teacherId)?.name || s.teacherId : "-"}</td>
                       <td style={tdStyle}>
+                        <button style={{ ...btnSmall, background: "#0ea5e9", color: "#fff", marginRight: 6 }} onClick={() => setShowStudentDetail(s)}>👁️ View</button>
                         <button style={{ ...btnSmall, background: "#2563eb", color: "#fff", marginRight: 6 }} onClick={() => startEditUser(s)}>✏️ Edit</button>
                         <button style={{ ...btnSmall, background: "#ef4444", color: "#fff" }} onClick={() => handleDeleteUser(s.id)}>🗑️</button>
                       </td>
@@ -399,22 +404,40 @@ export default function AdminDashboard() {
         {activeTab === "enrollments" && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-              <h1 style={{ fontSize: 24, fontWeight: 700 }}>🔗 Enrollments</h1>
-              <button style={btnPrimary} onClick={() => setShowAddEnrollment(true)}>➕ Add Enrollment</button>
+              <h1 style={{ fontSize: 24, fontWeight: 700 }}>🔗 Course Enrollment Management</h1>
+              <button style={btnPrimary} onClick={() => setShowAddEnrollment(true)}>➕ Assign Course to Student</button>
             </div>
             <div style={cardStyle}>
               <table style={tableStyle}>
-                <thead><tr><th style={thStyle}>ID</th><th style={thStyle}>Student ID</th><th style={thStyle}>Course ID</th><th style={thStyle}>Enrolled At</th><th style={thStyle}>Status</th><th style={thStyle}>Actions</th></tr></thead>
+                <thead><tr><th style={thStyle}>ID</th><th style={thStyle}>Student</th><th style={thStyle}>Course</th><th style={thStyle}>Enrolled At</th><th style={thStyle}>Status</th><th style={thStyle}>Actions</th></tr></thead>
                 <tbody>
-                  {enrollments.map(e => (
-                    <tr key={e.id}><td style={tdStyle}>{e.id}</td><td style={tdStyle}>{e.studentId}</td><td style={tdStyle}>{e.courseId}</td><td style={tdStyle}>{e.enrolledAt}</td>
-                      <td style={tdStyle}><span style={{ padding: "4px 10px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: e.status === "active" ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", color: e.status === "active" ? "#22c55e" : "#ef4444" }}>{e.status}</span></td>
-                      <td style={tdStyle}><button style={{ ...btnSmall, background: "#ef4444", color: "#fff" }} onClick={() => handleDeleteEnrollment(e.id)}>🗑️</button></td>
-                    </tr>
-                  ))}
+                  {enrollments.map(e => {
+                    const student = users.find(u => u.id === e.studentId);
+                    const course = courses.find(c => c.id === e.courseId);
+                    return (
+                      <tr key={e.id}>
+                        <td style={tdStyle}>{e.id}</td>
+                        <td style={tdStyle}>
+                          <div>
+                            <div style={{ fontWeight: 600 }}>{student?.name || `Student #${e.studentId}`}</div>
+                            <div style={{ fontSize: 11, color: "#94a3b8" }}>{student?.email || ""}</div>
+                          </div>
+                        </td>
+                        <td style={tdStyle}>
+                          <div>
+                            <div style={{ fontWeight: 600 }}>{course?.title || `Course #${e.courseId}`}</div>
+                            <div style={{ fontSize: 11, color: "#94a3b8" }}>{course?.code || ""}</div>
+                          </div>
+                        </td>
+                        <td style={tdStyle}>{e.enrolledAt}</td>
+                        <td style={tdStyle}><span style={{ padding: "4px 10px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: e.status === "active" ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", color: e.status === "active" ? "#22c55e" : "#ef4444" }}>{e.status}</span></td>
+                        <td style={tdStyle}><button style={{ ...btnSmall, background: "#ef4444", color: "#fff" }} onClick={() => handleDeleteEnrollment(e.id)}>🗑️ Remove</button></td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
-              {enrollments.length === 0 && <p style={{ textAlign: "center", color: "#94a3b8", padding: 32 }}>No enrollments.</p>}
+              {enrollments.length === 0 && <p style={{ textAlign: "center", color: "#94a3b8", padding: 32 }}>No enrollments yet. Click "Assign Course to Student" to get started.</p>}
             </div>
           </div>
         )}
@@ -559,6 +582,24 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* ==== TIMETABLE ==== */}
+        {activeTab === "timetable" && (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+              <h1 style={{ fontSize: 24, fontWeight: 700 }}>📅 Timetable Management</h1>
+            </div>
+            <div style={cardStyle}>
+              <p style={{ color: "#94a3b8", padding: 16, textAlign: "center" }}>
+                Timetable entries are managed through the database. Use the <strong>Database View</strong> tab to see all timetable records,
+                or create entries via the API at <code>/api/timetable</code>.
+              </p>
+              <div style={{ padding: 16, textAlign: "center" }}>
+                <button style={btnPrimary} onClick={() => setActiveTab("database")}>🗄️ View in Database</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ==== DATABASE VIEW ==== */}
         {activeTab === "database" && (
           <div>
@@ -680,6 +721,14 @@ export default function AdminDashboard() {
           <FormField label="Name" value={editUserForm.name || ""} onChange={v => setEditUserForm(p => ({ ...p, name: v }))} />
           <FormField label="Email" value={editUserForm.email || ""} onChange={v => setEditUserForm(p => ({ ...p, email: v }))} type="email" />
           <FormField label="Department" value={editUserForm.department || ""} onChange={v => setEditUserForm(p => ({ ...p, department: v }))} />
+          <FormField label="Section" value={editUserForm.section || ""} onChange={v => setEditUserForm(p => ({ ...p, section: v }))} placeholder="A, B, C..." />
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>Assigned Teacher</label>
+            <select value={editUserForm.teacherId || ""} onChange={e => setEditUserForm(p => ({ ...p, teacherId: e.target.value ? Number(e.target.value) : null }))} style={{ ...inputStyle, cursor: "pointer" }}>
+              <option value="">None</option>
+              {teachers.map(t => <option key={t.id} value={t.id}>{t.name} (ID: {t.id})</option>)}
+            </select>
+          </div>
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>Role</label>
             <select value={editUserForm.role || ""} onChange={e => setEditUserForm(p => ({ ...p, role: e.target.value }))} style={{ ...inputStyle, cursor: "pointer" }}>
@@ -709,12 +758,171 @@ export default function AdminDashboard() {
         </Modal>
       )}
 
+      {showAddEnrollment && (
+        <Modal title="➕ Assign Course to Student" onClose={() => setShowAddEnrollment(false)}>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>Select Student</label>
+            <select value={enrollmentForm.studentId} onChange={e => setEnrollmentForm(p => ({ ...p, studentId: Number(e.target.value) }))} style={{ ...inputStyle, cursor: "pointer" }}>
+              <option value="">-- Choose a Student --</option>
+              {students.map(s => <option key={s.id} value={s.id}>{s.name} ({s.email})</option>)}
+            </select>
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>Select Course</label>
+            <select value={enrollmentForm.courseId} onChange={e => setEnrollmentForm(p => ({ ...p, courseId: Number(e.target.value) }))} style={{ ...inputStyle, cursor: "pointer" }}>
+              <option value="">-- Choose a Course --</option>
+              {courses.map(c => <option key={c.id} value={c.id}>{c.code} — {c.title} ({c.credits} credits)</option>)}
+            </select>
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>Status</label>
+            <select value={enrollmentForm.status} onChange={e => setEnrollmentForm(p => ({ ...p, status: e.target.value }))} style={{ ...inputStyle, cursor: "pointer" }}>
+              <option value="active">Active</option>
+              <option value="dropped">Dropped</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+          {enrollmentForm.studentId && (
+            <div style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 12, padding: 12, marginBottom: 16, fontSize: 13 }}>
+              <p style={{ color: "#818cf8", fontWeight: 600, marginBottom: 4 }}>📋 Current enrollments for this student:</p>
+              {enrollments.filter(e => e.studentId === enrollmentForm.studentId).length === 0
+                ? <p style={{ color: "#94a3b8" }}>No courses assigned yet.</p>
+                : enrollments.filter(e => e.studentId === enrollmentForm.studentId).map(e => {
+                    const c = courses.find(cc => cc.id === e.courseId);
+                    return <p key={e.id} style={{ color: "#cbd5e1" }}>• {c?.code || ""} — {c?.title || `Course #${e.courseId}`} ({e.status})</p>;
+                  })
+              }
+            </div>
+          )}
+          <button style={{ ...btnPrimary, width: "100%", marginTop: 8 }} onClick={handleAddEnrollment} disabled={!enrollmentForm.studentId || !enrollmentForm.courseId}>Assign Course</button>
+        </Modal>
+      )}
+
+      {/* ==== STUDENT DETAIL VIEW ==== */}
+      {showStudentDetail && (() => {
+        const s = showStudentDetail;
+        const studentEnrollments = enrollments.filter(e => e.studentId === s.id);
+        const studentMarks = marks.filter(m => m.studentId === s.id);
+        const studentAttendance = attendance.filter(a => a.studentId === s.id);
+        const studentPayments = feePayments.filter(p => p.studentId === s.id);
+        const assignedTeacher = teachers.find(t => t.id === s.teacherId);
+        const totalPresent = studentAttendance.filter(a => a.status === "present").length;
+        const attendanceRate = studentAttendance.length > 0 ? Math.round((totalPresent / studentAttendance.length) * 100) : 0;
+        return (
+          <div style={modalOverlay} onClick={() => setShowStudentDetail(null)}>
+            <div style={{ ...modalBox, maxWidth: 800, maxHeight: "90vh", overflowY: "auto" }} onClick={e => e.stopPropagation()}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <h2 style={{ margin: 0, fontSize: 22 }}>👤 Student Profile — {s.name}</h2>
+                <button onClick={() => setShowStudentDetail(null)} style={{ background: "none", border: "none", color: "#94a3b8", fontSize: 24, cursor: "pointer" }}>×</button>
+              </div>
+
+              {/* BASIC INFO */}
+              <div style={{ ...cardStyle, marginBottom: 16 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, fontSize: 14 }}>
+                  <div><span style={{ color: "#94a3b8" }}>Email:</span> <span style={{ color: "#fff", fontWeight: 600 }}>{s.email}</span></div>
+                  <div><span style={{ color: "#94a3b8" }}>Department:</span> <span style={{ color: "#fff", fontWeight: 600 }}>{s.department || "-"}</span></div>
+                  <div><span style={{ color: "#94a3b8" }}>Section:</span> <span style={{ color: "#fff", fontWeight: 600 }}>{s.section || "-"}</span></div>
+                  <div><span style={{ color: "#94a3b8" }}>Status:</span> <span style={{ color: s.status === "active" ? "#22c55e" : "#ef4444", fontWeight: 600 }}>{s.status}</span></div>
+                  <div><span style={{ color: "#94a3b8" }}>Assigned Teacher:</span> <span style={{ color: "#818cf8", fontWeight: 600 }}>{assignedTeacher ? `${assignedTeacher.name} (${assignedTeacher.email})` : "Not assigned"}</span></div>
+                  <div><span style={{ color: "#94a3b8" }}>Attendance:</span> <span style={{ color: attendanceRate >= 75 ? "#22c55e" : "#ef4444", fontWeight: 600 }}>{attendanceRate}% ({totalPresent}/{studentAttendance.length})</span></div>
+                </div>
+                <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+                  <button style={{ ...btnSmall, background: "#2563eb", color: "#fff" }} onClick={() => { setShowStudentDetail(null); startEditUser(s); }}>✏️ Edit Student</button>
+                  <button style={{ ...btnSmall, background: "#6366f1", color: "#fff" }} onClick={() => { setEnrollmentForm({ studentId: s.id, courseId: "", status: "active" }); setShowStudentDetail(null); setShowAddEnrollment(true); }}>➕ Assign Course</button>
+                </div>
+              </div>
+
+              {/* ENROLLED COURSES */}
+              <div style={{ ...cardStyle, marginBottom: 16 }}>
+                <h3 style={{ margin: "0 0 12px 0", fontSize: 16, color: "#e2e8f0" }}>📚 Enrolled Courses ({studentEnrollments.length})</h3>
+                {studentEnrollments.length === 0 ? (
+                  <p style={{ color: "#94a3b8", fontSize: 13 }}>No courses enrolled. Click "Assign Course" above to add.</p>
+                ) : (
+                  <table style={{ ...tableStyle, fontSize: 13 }}>
+                    <thead><tr><th style={thStyle}>Course</th><th style={thStyle}>Code</th><th style={thStyle}>Instructor</th><th style={thStyle}>Status</th><th style={thStyle}>Action</th></tr></thead>
+                    <tbody>
+                      {studentEnrollments.map(e => {
+                        const c = courses.find(cc => cc.id === e.courseId);
+                        return (
+                          <tr key={e.id}>
+                            <td style={tdStyle}>{c?.title || `#${e.courseId}`}</td>
+                            <td style={tdStyle}>{c?.code || "-"}</td>
+                            <td style={tdStyle}>{c?.instructor || "-"}</td>
+                            <td style={tdStyle}><span style={{ padding: "3px 8px", borderRadius: 12, fontSize: 11, fontWeight: 600, background: e.status === "active" ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", color: e.status === "active" ? "#22c55e" : "#ef4444" }}>{e.status}</span></td>
+                            <td style={tdStyle}><button style={{ ...btnSmall, background: "#ef4444", color: "#fff", fontSize: 11 }} onClick={async () => { await api.deleteEnrollment(e.id); showToast("Removed"); await loadData(); setShowStudentDetail({...s}); }}>Remove</button></td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+
+              {/* MARKS / GRADES */}
+              <div style={{ ...cardStyle, marginBottom: 16 }}>
+                <h3 style={{ margin: "0 0 12px 0", fontSize: 16, color: "#e2e8f0" }}>📝 Marks & Grades ({studentMarks.length})</h3>
+                {studentMarks.length === 0 ? (
+                  <p style={{ color: "#94a3b8", fontSize: 13 }}>No marks recorded yet.</p>
+                ) : (
+                  <table style={{ ...tableStyle, fontSize: 13 }}>
+                    <thead><tr><th style={thStyle}>Course</th><th style={thStyle}>Exam</th><th style={thStyle}>Score</th><th style={thStyle}>Grade</th></tr></thead>
+                    <tbody>
+                      {studentMarks.map(m => (
+                        <tr key={m.id}>
+                          <td style={tdStyle}>{m.courseName || "-"}</td>
+                          <td style={tdStyle}>{m.examName || "-"}</td>
+                          <td style={tdStyle}>{m.score}/{m.total}</td>
+                          <td style={tdStyle}><span style={{ padding: "3px 8px", borderRadius: 12, fontSize: 11, fontWeight: 700, background: "rgba(99,102,241,0.15)", color: "#818cf8" }}>{m.grade}</span></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+
+              {/* FEE PAYMENTS */}
+              <div style={cardStyle}>
+                <h3 style={{ margin: "0 0 12px 0", fontSize: 16, color: "#e2e8f0" }}>💰 Fee Payments ({studentPayments.length})</h3>
+                {studentPayments.length === 0 ? (
+                  <p style={{ color: "#94a3b8", fontSize: 13 }}>No payments recorded.</p>
+                ) : (
+                  <table style={{ ...tableStyle, fontSize: 13 }}>
+                    <thead><tr><th style={thStyle}>Fee Item</th><th style={thStyle}>Amount</th><th style={thStyle}>Method</th><th style={thStyle}>Status</th><th style={thStyle}>Paid At</th></tr></thead>
+                    <tbody>
+                      {studentPayments.map(p => {
+                        const fi = feeItems.find(f => f.id === p.feeItemId);
+                        return (
+                          <tr key={p.id}>
+                            <td style={tdStyle}>{fi?.name || `#${p.feeItemId}`}</td>
+                            <td style={tdStyle}>₹{p.amountPaid?.toLocaleString()}</td>
+                            <td style={tdStyle}>{p.method || "-"}</td>
+                            <td style={tdStyle}><span style={{ padding: "3px 8px", borderRadius: 12, fontSize: 11, fontWeight: 600, background: p.status === "paid" ? "rgba(34,197,94,0.15)" : "rgba(245,158,11,0.15)", color: p.status === "paid" ? "#22c55e" : "#f59e0b" }}>{p.status}</span></td>
+                            <td style={tdStyle}>{p.paidAt || "-"}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       <style>{`
         @media (max-width: 768px) {
           .admin-mobile-toggle { display: block !important; }
           main { margin-left: 0 !important; padding: 16px !important; padding-top: 60px !important; }
           aside { transform: translateX(${sidebarOpen ? "0" : "-100%"}); }
           table { font-size: 12px !important; }
+        }
+        select, select option {
+          background-color: #1e2540 !important;
+          color: #fff !important;
+        }
+        select option:hover, select option:checked {
+          background-color: #6366f1 !important;
         }
       `}</style>
     </div>

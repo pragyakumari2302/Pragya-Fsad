@@ -1,0 +1,258 @@
+================================================================================
+                    CampusCore ERP — WORKFLOW & PITCH DOCUMENT
+================================================================================
+
+PROJECT NAME:   CampusCore ERP
+TEAM:           Pragya (Full-Stack Academic Management Platform)
+STACK:          React 19 + Vite (Frontend) | Spring Boot 3 + MySQL (Backend)
+VERSION:        4.0 — Role-Based Access Control Edition
+
+================================================================================
+                              ELEVATOR PITCH
+================================================================================
+
+CampusCore ERP is a comprehensive, role-based academic Enterprise Resource
+Planning system designed for modern educational institutions. It provides a
+unified platform where Students, Teachers, and Administrators can seamlessly
+manage academic operations — from course enrollment and fee payments to
+attendance tracking, grade management, and dynamic timetabling.
+
+KEY DIFFERENTIATORS:
+  • Three-tier role-based access control (Student / Teacher / Admin)
+  • JWT-secured REST APIs with per-role data filtering
+  • Dynamic timetable linked to courses, sections, and teachers
+  • Real-time admin dashboard with full CRUD across all entities
+  • Responsive, premium UI built with TailwindCSS + Framer Motion
+  • One-click deployment via Cloudflare tunnels for instant sharing
+  • Data-driven architecture — zero hardcoded values in production
+
+================================================================================
+                           LOGIN CREDENTIALS
+================================================================================
+
+  ┌─────────────┬──────────────────────────┬──────────┬──────────────────────┐
+  │   ROLE      │   EMAIL                  │ PASSWORD │   ACCESS LEVEL       │
+  ├─────────────┼──────────────────────────┼──────────┼──────────────────────┤
+  │ 🛡️  Admin   │ admin@system.com         │ 1234     │ Full Access (CRUD)   │
+  │ 👨‍🏫 Teacher  │ teacher@system.com       │ 1234     │ Limited (Own Data)   │
+  │ 🎓 Student  │ student@system.com       │ 1234     │ Personal Access Only │
+  └─────────────┴──────────────────────────┴──────────┴──────────────────────┘
+
+  MASTER PASSWORD: 1234
+  (Works for ANY account — demo/development convenience)
+
+  NOTE: The Login page has quick-login demo buttons for all three roles.
+
+================================================================================
+                       ROLE ACCESS MATRIX
+================================================================================
+
+  ┌────────────────────────┬───────────┬───────────┬───────────┐
+  │ FEATURE                │  STUDENT  │  TEACHER  │   ADMIN   │
+  ├────────────────────────┼───────────┼───────────┼───────────┤
+  │ Dashboard              │    ✅     │    ✅     │    ✅     │
+  │ Courses / My Courses   │    ✅     │    ✅     │    ✅     │
+  │ Attendance             │    ✅     │    ✅     │    ✅     │
+  │ Exams & Grades         │    ✅     │    ✅     │    ✅     │
+  │ Timetable              │    ✅     │    ✅     │    ✅     │
+  │ Fee Payments           │    ✅     │    ❌     │    ✅     │
+  │ Library                │    ✅     │    ❌     │    ✅     │
+  │ CGPA & Grades          │    ✅     │    ❌     │    ✅     │
+  │ Student Directory      │    ❌     │    ❌     │    ✅     │
+  │ Manage All Users       │    ❌     │    ❌     │    ✅     │
+  │ Reports                │    ❌     │    ❌     │    ✅     │
+  │ Database View          │    ❌     │    ❌     │    ✅     │
+  │ Profile                │    ✅     │    ✅     │    ✅     │
+  └────────────────────────┴───────────┴───────────┴───────────┘
+
+================================================================================
+                     WORKFLOW — WHAT EACH ROLE CAN DO
+================================================================================
+
+─── STUDENT WORKFLOW ───────────────────────────────────────────────────────────
+
+  1. LOGIN  →  student@system.com / 1234
+  2. DASHBOARD  →  View enrolled courses, attendance %, upcoming exams, CGPA
+  3. MY COURSES  →  See enrolled courses with schedule, instructor, room
+  4. ATTENDANCE  →  View attendance history per course (present/absent/late)
+  5. EXAMS  →  View upcoming exams and past results with grades
+  6. FEES  →  View fee items, payment history, make new payments
+  7. TIMETABLE  →  Dynamic weekly schedule based on assigned section
+  8. LIBRARY  →  Browse catalog, view issued books
+  9. CGPA  →  View semester-wise grades and cumulative GPA
+  10. PROFILE  →  View/update personal information
+
+─── TEACHER WORKFLOW ───────────────────────────────────────────────────────────
+
+  1. LOGIN  →  teacher@system.com / 1234
+  2. EDUCATOR DASHBOARD  →  View assigned student count, today's classes
+  3. MANAGE COURSES  →  View courses they teach
+  4. MARK ATTENDANCE  →  Record attendance for assigned courses
+  5. MANAGE EXAMS  →  Create exams, submit grades
+  6. MY SCHEDULE  →  Dynamic timetable filtered by teacher ID
+  7. PROFILE  →  View/update personal information
+
+  RESTRICTIONS:
+    ✗ Cannot access Fee Payments (403 Forbidden)
+    ✗ Cannot access Student Directory
+    ✗ Cannot access Reports or Database View
+    ✗ Can only see students assigned to them (via teacherId)
+
+─── ADMIN WORKFLOW ─────────────────────────────────────────────────────────────
+
+  1. LOGIN  →  admin@system.com / 1234
+  2. ADMIN DASHBOARD  →  Full overview with stats, activity feed
+  3. MANAGE STUDENTS  →  Add/Edit/Delete students
+       • Assign section (A, B, C...)
+       • Assign teacher (dropdown from teachers list)
+  4. MANAGE TEACHERS  →  Add/Edit/Delete teacher accounts
+  5. MANAGE COURSES  →  Add/Edit/Delete courses
+  6. MANAGE ENROLLMENTS  →  Link students to courses
+  7. MANAGE ATTENDANCE  →  View/bulk-create attendance records
+  8. MANAGE MARKS  →  View/create grade entries
+  9. MANAGE FEES  →  Create fee items, view/manage payments
+  10. MANAGE LIBRARY  →  Add books, manage issues/returns
+  11. TIMETABLE  →  View/manage timetable entries
+  12. DATABASE VIEW  →  Raw view of all database tables
+  13. PROFILE  →  System admin profile
+
+================================================================================
+                     TECHNICAL ARCHITECTURE
+================================================================================
+
+  ┌──────────────┐     JWT Token     ┌──────────────┐    JPA/Hibernate
+  │   Frontend   │ ◄──────────────► │   Backend    │ ◄──────────────► MySQL
+  │  React+Vite  │    REST APIs      │ Spring Boot  │                  DB
+  │  Port: 5173  │                   │  Port: 9090  │              "pragya"
+  └──────────────┘                   └──────────────┘
+
+  FRONTEND (FSAD_PROJECT/):
+    • React 19 with React Router v7
+    • TailwindCSS + Framer Motion for animations
+    • Lucide React icons
+    • JWT stored in localStorage
+    • API layer in src/api/mockApi.js
+
+  BACKEND (backend Pragya/):
+    • Spring Boot 3.3.5 with Java 17+
+    • Spring Security + JWT (HS512)
+    • Spring Data JPA + Hibernate
+    • MySQL database "pragya"
+    • 15 JPA repositories, 10+ REST controllers
+
+  KEY ENTITIES:
+    User, Course, Enrollment, AttendanceRecord, Mark, ExamResult,
+    ExamUpcoming, FeeItem, FeePayment, LibraryBook, LibraryIssue,
+    Timetable, Report, DashboardStats, DashboardActivity
+
+================================================================================
+                       API ENDPOINTS (KEY)
+================================================================================
+
+  AUTH (no JWT required):
+    POST /api/auth/login          — Login with email + password
+    POST /api/auth/signup         — Create new account
+
+  USERS (JWT required):
+    GET  /api/users               — Admin: all | Teacher: assigned students
+    POST /api/users               — Create user
+    PUT  /api/users/{id}          — Update user (incl. section, teacherId)
+    DEL  /api/users/{id}          — Delete user
+
+  FEES (JWT required):
+    GET  /api/fees/items           — Fee structure (Teacher blocked)
+    GET  /api/fees/payments        — Student: own | Admin: all | Teacher: 403
+    GET  /api/fees/payments/student/{id}  — Payments by student
+    POST /api/fees/payments        — Create payment (Admin/Student only)
+
+  TIMETABLE (JWT required):
+    GET  /api/timetable            — All entries
+    GET  /api/timetable/section/{s} — By section (for students)
+    GET  /api/timetable/teacher/{id} — By teacher ID
+
+  COURSES, ATTENDANCE, MARKS, EXAMS, LIBRARY — Standard CRUD at /api/*
+
+================================================================================
+                           HOW TO RUN
+================================================================================
+
+  OPTION A — ONE-CLICK START (from project root):
+
+      powershell -ExecutionPolicy Bypass -File .\start-all.ps1
+
+  OPTION B — MANUAL START:
+
+      Terminal 1 (Backend):
+        cd "backend Pragya"
+        %USERPROFILE%\.maven\maven-3.9.14\bin\mvn.cmd spring-boot:run
+
+      Terminal 2 (Frontend):
+        cd FSAD_PROJECT
+        npm run dev
+
+      Then open: http://localhost:5173
+
+  PREREQUISITES:
+    • Java 17+
+    • Maven 3.9+
+    • Node.js 18+ / npm
+    • MySQL running with database "pragya"
+    • MySQL credentials: root / Amit@0602 (see application.properties)
+
+================================================================================
+                     DATA SEEDING (AUTO)
+================================================================================
+
+  On first run with an empty database, the system automatically seeds:
+
+  USERS:
+    • Admin  — admin@system.com (password: 1234)
+    • Teacher — teacher@system.com (password: 1234)
+    • Student — student@system.com (password: 1234, section: A)
+
+  SAMPLE DATA:
+    • 8 courses (CSE201 through CSE225)
+    • 5 enrollments for the demo student
+    • 8 fee items (tuition, lab, library, hostel, etc.)
+    • 2 fee payments (1 paid, 1 pending)
+    • 12 attendance records across 3 courses
+    • 5 marks with grades
+    • 8 timetable entries (section A, linked to teacher)
+    • 5 upcoming exams
+    • 5 past exam results
+    • 8 reports
+    • 10 library books
+    • 6 dashboard activity entries
+
+================================================================================
+                     SECURITY IMPLEMENTATION
+================================================================================
+
+  • JWT tokens signed with HS512 algorithm
+  • Token expiry: 24 hours (86400000 ms)
+  • Master password "1234" for demo access to any account
+  • All /api/** endpoints require valid JWT (except /api/auth/**)
+  • Role extracted from JWT claims on every request
+  • Backend enforces role-based filtering at controller level
+  • Frontend enforces visibility at component level (sidebar, guards)
+
+================================================================================
+                        VERSION HISTORY
+================================================================================
+
+  v1.0 — Basic React frontend with mock data
+  v2.0 — Spring Boot backend integration with MySQL
+  v3.0 — Admin Dashboard with full CRUD operations
+  v4.0 — Role-Based Access Control (RBAC) patch:
+          • Student fee access fix (FIX 1)
+          • JWT-enforced API security (FIX 2)
+          • Student-course mapping (FIX 3)
+          • Admin edit enhancement — section/teacherId (FIX 4)
+          • Teacher data restrictions (FIX 5)
+          • Dynamic timetable from database (FIX 6)
+          • Real-time refresh after edits (FIX 7)
+          • Frontend role visibility (FIX 8)
+          • Default seeded accounts (FIX 9)
+          • Cross-entity data linking (FIX 10)
+
+================================================================================

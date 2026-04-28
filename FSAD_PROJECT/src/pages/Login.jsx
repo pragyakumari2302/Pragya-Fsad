@@ -14,7 +14,12 @@ export default function Login() {
 
   const handleDemoLogin = async (role) => {
     // Use real backend demo accounts seeded in the database
-    const demoEmail = role === "Teacher" ? "teacher@campuscore.edu" : "student@campuscore.edu";
+    const emails = {
+      "Admin": "admin@system.com",
+      "Teacher": "teacher@system.com",
+      "Student": "student@system.com"
+    };
+    const demoEmail = emails[role] || "student@system.com";
     const demoPassword = "1234";
     await handleLoginRequest(demoEmail, demoPassword);
   };
@@ -161,7 +166,7 @@ export default function Login() {
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-4">
+            <div className="mt-6 grid grid-cols-3 gap-3">
               <button
                 onClick={() => handleDemoLogin("Student")}
                 className="flex justify-center py-2.5 border border-sky-200 rounded-xl text-sm font-medium text-sky-700 bg-sky-50 hover:bg-sky-100 transition-colors"
@@ -173,6 +178,12 @@ export default function Login() {
                 className="flex justify-center py-2.5 border border-indigo-200 rounded-xl text-sm font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors"
               >
                 👨‍🏫 Teacher
+              </button>
+              <button
+                onClick={() => handleDemoLogin("Admin")}
+                className="flex justify-center py-2.5 border border-amber-200 rounded-xl text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 transition-colors"
+              >
+                🛡️ Admin
               </button>
             </div>
           </div>

@@ -6,6 +6,22 @@ import Loader from "../components/ui/Loader";
 
 export default function FeePayments() {
   const { user } = useAuth();
+
+  // Teachers cannot access fees (FIX 1, 5)
+  if (user?.role === "Teacher") {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <div className="w-16 h-16 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center">
+          <CreditCard className="w-8 h-8" />
+        </div>
+        <h2 className="text-xl font-bold text-white">Access Denied</h2>
+        <p className="text-slate-400 text-center max-w-md">
+          Fee management is not available for teachers. Please contact an administrator for fee-related queries.
+        </p>
+      </div>
+    );
+  }
+
   const [items, setItems] = useState([]);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);

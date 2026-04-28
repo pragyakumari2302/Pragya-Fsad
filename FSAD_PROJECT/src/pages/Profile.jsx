@@ -43,9 +43,13 @@ export default function Profile() {
       setSavingPassword(true);
       try {
          const API = import.meta.env.VITE_API_URL || "http://localhost:9090/api";
+         const token = localStorage.getItem("token");
          const res = await fetch(`${API}/users/${user.id}/change-password`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+               "Content-Type": "application/json",
+               ...(token ? { "Authorization": `Bearer ${token}` } : {})
+            },
             body: JSON.stringify({ newPassword })
          });
          if (res.ok) {

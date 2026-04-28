@@ -37,8 +37,6 @@ const teacherNavItems = [
   { to: "/courses", label: "Manage Courses", Icon: BookOpen },
   { to: "/attendance", label: "Mark Attendance", Icon: CheckSquare },
   { to: "/exam", label: "Manage Exams", Icon: GraduationCap },
-  { to: "/users", label: "Student Directory", Icon: Users },
-  { to: "/reports", label: "Analytical Reports", Icon: LineChart },
   { to: "/timetable", label: "My Schedule", Icon: Calendar },
   { to: "/profile", label: "Profile", Icon: User },
   { to: "/settings", label: "Settings", Icon: Settings },

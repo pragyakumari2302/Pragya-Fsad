@@ -114,3 +114,11 @@ export async function deleteLibraryIssue(id) { return apiDelete(`/library/issues
 // ---- Database View (Admin) ----
 export async function fetchDatabaseView() { return apiGet("/database"); }
 export async function fetchDatabaseStats() { return apiGet("/database/stats"); }
+
+// ---- Timetable ----
+export async function fetchTimetable() { return apiGet("/timetable"); }
+export async function fetchTimetableBySection(section) { return apiGet(`/timetable/section/${section}`); }
+export async function fetchTimetableByTeacher(teacherId) { return apiGet(`/timetable/teacher/${teacherId}`); }
+export async function createTimetableEntry(entry) { return apiPost("/timetable", entry); }
+export async function updateTimetableEntry(id, data) { return apiPut(`/timetable/${id}`, data); }
+export async function deleteTimetableEntry(id) { return apiDelete(`/timetable/${id}`); }

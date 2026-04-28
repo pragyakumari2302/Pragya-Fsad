@@ -20,7 +20,7 @@
 
 # -- Configuration -----------------------------------------------------------
 $ProjectRoot    = $PSScriptRoot
-$BackendDir     = Join-Path $ProjectRoot "backend"
+$BackendDir     = Join-Path $ProjectRoot "backend Pragya"
 $FrontendDir    = Join-Path $ProjectRoot "FSAD_PROJECT"
 $EnvFile        = Join-Path $FrontendDir ".env"
 $BackendPort    = 9090
@@ -38,16 +38,18 @@ $backendProcess = Start-Process -FilePath "$env:USERPROFILE\.maven\maven-3.9.14\
 
 Log "Backend PID: $($backendProcess.Id)" "Green"
 
-# Wait for backend to become ready (poll /api/courses endpoint)
+# Wait for backend to become ready (TCP socket check on port 9090)
 Log "Waiting for backend to be ready ..." "Yellow"
 $ready = $false
 for ($i = 0; $i -lt 60; $i++) {
     Start-Sleep -Seconds 3
     try {
-        $response = Invoke-WebRequest -Uri "http://localhost:$BackendPort/api/courses" -UseBasicParsing -TimeoutSec 2 -ErrorAction Stop
-        if ($response.StatusCode -lt 500) { $ready = $true; break }
+        $tcp = New-Object System.Net.Sockets.TcpClient
+        $tcp.Connect("localhost", $BackendPort)
+        $tcp.Close()
+        $ready = $true
+        break
     } catch {
-        # still starting up
         Write-Host "." -NoNewline -ForegroundColor DarkGray
     }
 }
